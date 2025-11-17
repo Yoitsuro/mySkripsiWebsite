@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>ETH Forecast - TCN + LGBM</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/app.js" defer></script>
+  </head>
+  <body>
+    <div class="layout">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div>
+            <h1 class="app-title">ETH Forecast</h1>
+            <p class="app-subtitle">TCN + LGBM + Stacking</p>
+          </div>
+          <button
+            id="themeToggle"
+            class="theme-toggle-btn"
+            aria-label="Toggle theme"
+          >
+            🌙
+          </button>
+        </div>
+
+        <nav class="sidebar-nav">
+          <button class="nav-btn active" data-page="home">Home</button>
+          <button class="nav-btn" data-page="metrics">Metrics</button>
+          <button class="nav-btn" data-page="forecast">Forecasting</button>
+        </nav>
+      </aside>
+
+      <!-- MAIN CONTENT -->
+      <main class="main">
+        <!-- HOME -->
+        <section id="page-home" class="page active">
+          <h2>Harga Ethereum</h2>
+          <p class="timezone-info">
+            Waktu grafik menggunakan timestamp UTC dari Binance. (Local time:
+            <span id="localTime"></span>)
+          </p>
+          <p>Pilih rentang waktu (interval 1 jam).</p>
+          <div class="controls">
+            <button class="range-btn primary" data-days="1">1 Hari</button>
+            <button class="range-btn" data-days="7">7 Hari</button>
+            <button class="range-btn" data-days="30">30 Hari</button>
+          </div>
+          <div class="status" id="homeStatus"></div>
+          <canvas id="priceChart" height="120"></canvas>
+        </section>
+
+        <!-- METRICS -->
+        <section id="page-metrics" class="page">
+          <h2>Performa Model</h2>
+          <p>Metrik evaluasi pada data uji.</p>
+          <div class="status" id="metricsStatus"></div>
+          <table id="metricsTable">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>RMSE</th>
+                <th>MSE</th>
+                <th>MAE</th>
+                <th>MAPE</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+          <h3>Visualisasi Actual vs Prediksi</h3>
+          <p>Menampilkan beberapa titik terakhir dari data uji.</p>
+          <canvas id="evalChart" height="120"></canvas>
+          <div class="status" id="evalStatus"></div>
+        </section>
+
+        <!-- FORECAST -->
+        <section id="page-forecast" class="page">
+          <h2>Forecast Harga ke Depan</h2>
+          <p>Pilih horizon prediksi (maksimal 168 jam / 1 minggu).</p>
+
+          <div class="forecast-group">
+            <div>
+              <label
+                ><input
+                  type="checkbox"
+                  class="preset-horizon"
+                  value="1"
+                  checked
+                />
+                1 jam</label
+              >
+              <label
+                ><input type="checkbox" class="preset-horizon" value="5" /> 5
+                jam</label
+              >
+            </div>
+            <div>
+              <label
+                ><input type="checkbox" class="preset-horizon" value="24" /> 24
+                jam</label
+              >
+              <label
+                ><input type="checkbox" class="preset-horizon" value="72" /> 72
+                jam</label
+              >
+            </div>
+          </div>
+
+          <div class="forecast-group">
+            <label>Custom horizon (jam, max 168):</label>
+            <input
+              type="number"
+              id="customHorizon"
+              min="1"
+              max="168"
+              placeholder="contoh: 12"
+            />
+          </div>
+
+          <button id="btnForecast" class="primary">Hitung Forecast</button>
+          <div class="status" id="forecastStatus"></div>
+
+          <table id="forecastTable">
+            <thead>
+              <tr>
+                <th>Horizon</th>
+                <th>Steps Digunakan</th>
+                <th>Prediksi Close (Stacking)</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </section>
+      </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/app.js" defer></script>
+  </body>
+</html>
