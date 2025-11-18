@@ -2,6 +2,7 @@ const API_BASE = "http://localhost:8000";
 
 let priceChart = null;
 let evalChart = null;
+let forecastChart = null;
 
 document.addEventListener("DOMContentLoaded", () => {
   setupNavigation();
@@ -333,63 +334,67 @@ function setupForecastPage() {
 // Catatan: Fungsi doForecast() yang sebelumnya saya berikan sudah benar
 // untuk mengambil nilai dari salah satu sumber (Custom Input atau Radio Button).
 
+// GANTI SELURUH FUNGSI INI
 async function doForecast() {
   const statusEl = document.getElementById("forecastStatus");
+  const chartStatusEl = document.getElementById("forecastChartStatus"); // Status u/ chart
   const tbody = document.querySelector("#forecastTable tbody");
   const horizonRadios = document.querySelectorAll(".horizon-radio");
   const customInput = document.getElementById("customHorizon");
 
+  // Reset status
   statusEl.textContent = "";
+  chartStatusEl.textContent = "";
   tbody.innerHTML = "";
 
-  // 1. Tentukan horizon yang dipilih/diisi
-  const horizons = new Set();
+  // 1. Hancurkan chart lama (jika ada)
+  if (forecastChart) {
+    forecastChart.destroy();
+    forecastChart = null;
+  }
 
+  // 2. Tentukan horizon MAKSIMAL yang dipilih
+  let maxHorizon = 0;
   const customVal = customInput.value.trim();
 
   if (customVal) {
-    // Prioritas 1: Ambil dari input custom jika terisi
+    // Prioritas 1: Ambil dari input custom
     const n = parseInt(customVal, 10);
-
-    // Validasi input custom
     if (isNaN(n) || n < 1 || n > 168) {
       statusEl.textContent = "Custom horizon harus antara 1 hingga 168 jam.";
       return;
     }
-    horizons.add(n);
+    maxHorizon = n;
   } else {
-    // Prioritas 2: Ambil dari radio button yang terpilih
+    // Prioritas 2: Ambil dari radio button
     let selectedRadioValue = null;
     horizonRadios.forEach((radio) => {
       if (radio.checked) {
         selectedRadioValue = radio.value;
       }
     });
-
     if (selectedRadioValue) {
-      horizons.add(parseInt(selectedRadioValue, 10));
+      maxHorizon = parseInt(selectedRadioValue, 10);
     }
   }
 
-  // Harus ada 1 horizon yang terpilih/terisi
-  if (horizons.size === 0) {
+  if (maxHorizon === 0) {
     statusEl.textContent =
       "Pilih minimal satu horizon atau isi Custom Horizon.";
     return;
   }
 
-  // Lanjutkan dengan 1 horizon yang terpilih
-  const hoursArr = Array.from(horizons);
-  const horizonsStr = hoursArr.join(","); // Akan selalu hanya 1 nilai
+  // 3. PERUBAHAN UTAMA: Buat string "1,2,3,...,maxHorizon"
+  const hoursArr = Array.from({ length: maxHorizon }, (_, i) => i + 1);
+  const horizonsStr = hoursArr.join(",");
 
-  statusEl.textContent = "Menghitung forecast...";
+  statusEl.textContent = `Menghitung forecast untuk ${maxHorizon} jam ke depan...`;
 
   try {
     const url = `${API_BASE}/forecast?symbol=${encodeURIComponent(
       "ETH/USDT"
     )}&horizons=${encodeURIComponent(horizonsStr)}`;
     const res = await fetch(url);
-    // ... Sisa kode tidak berubah ...
     if (!res.ok) {
       const msg = await res.text();
       throw new Error(`HTTP ${res.status}: ${msg}`);
@@ -397,15 +402,19 @@ async function doForecast() {
     const data = await res.json();
 
     const entries = Object.entries(data.results || {});
-    // Urutkan (meskipun hanya 1, tapi untuk konsistensi)
+    // Urutkan berdasarkan horizon (1h, 2h, 3h, ...)
     entries.sort((a, b) => {
       const ha = parseInt(a[0].replace("h", ""), 10);
       const hb = parseInt(b[0].replace("h", ""), 10);
       return ha - hb;
     });
 
+    // 4. Siapkan data untuk tabel DAN grafik
+    const chartLabels = [];
+    const chartData = [];
+
     entries.forEach(([key, info]) => {
-      // convert ke format yang lebih enak dibaca local user
+      // Data untuk Tabel
       const targetLocal = new Date(info.target_time_local).toLocaleString(
         "id-ID",
         {
@@ -416,20 +425,66 @@ async function doForecast() {
 
       const tr = document.createElement("tr");
       tr.innerHTML = `
-    <td>${key} <br><small>Target: ${targetLocal}</small></td>
-    <td>${info.steps_used}</td>
-    <td>${Number(info.pred_stack).toFixed(4)}</td>
-  `;
+        <td>${key} <br><small>Target: ${targetLocal}</small></td>
+        <td>${info.steps_used}</td>
+        <td>${Number(info.pred_stack).toFixed(4)}</td>
+      `;
       tbody.appendChild(tr);
+
+      // Data untuk Grafik
+      chartLabels.push(targetLocal); // Sumbu X
+      chartData.push(Number(info.pred_stack)); // Sumbu Y
     });
+
     document.getElementById("forecastTimeNow").textContent =
       "Forecast dihasilkan pada: " +
       new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" });
 
     statusEl.textContent = `Forecast selesai. Timeframe: ${data.timeframe}.`;
+
+    // 5. Render Grafik
+    if (chartLabels.length > 0) {
+      const ctx = document.getElementById("forecastChart").getContext("2d");
+      forecastChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: chartLabels,
+          datasets: [
+            {
+              label: `Forecast (Stacking) - ${maxHorizon} jam`,
+              data: chartData,
+              fill: false,
+              borderWidth: 1.5,
+              pointRadius: 2,
+              pointHitRadius: 6,
+              borderColor: "#007bff", // Warna biru
+              tension: 0.1,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          interaction: { mode: "nearest", intersect: false },
+          plugins: {
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ` Prediksi: ${ctx.parsed.y.toFixed(4)}`,
+                title: (items) => items[0]?.label || "", // Judul tooltip pakai timestamp
+              },
+            },
+          },
+          scales: {
+            x: { ticks: { maxTicksLimit: 10 } }, // Batasi label X
+            y: { beginAtZero: false },
+          },
+        },
+      });
+      chartStatusEl.textContent = "Grafik forecast berhasil dimuat.";
+    }
   } catch (err) {
     console.error(err);
     statusEl.textContent =
       "Terjadi error saat memanggil API forecast. Cek log backend.";
+    chartStatusEl.textContent = "Gagal memuat grafik forecast.";
   }
 }

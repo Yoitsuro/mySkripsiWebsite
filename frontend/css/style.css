@@ -132,3 +132,15 @@ th {
 label {
   font-size: 0.9rem;
 }
+
+/* Penyesuaian untuk Grafik Forecast */
+.chart-header {
+  margin-top: 24px;
+  margin-bottom: 8px;
+  border-top: 1px solid #eee;
+  padding-top: 16px;
+}
+
+#forecastChart {
+  margin-top: 12px;
+}
