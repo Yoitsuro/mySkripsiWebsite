@@ -71,47 +71,61 @@
           <p>Pilih horizon prediksi (maksimal 168 jam / 1 minggu).</p>
 
           <div class="forecast-group">
-            <div>
-              <label
-                ><input
-                  type="checkbox"
-                  class="preset-horizon"
+            <div class="radio-options">
+              <label>
+                <input
+                  type="radio"
+                  class="horizon-radio"
+                  name="horizon-group"
                   value="1"
                   checked
                 />
-                1 jam</label
-              >
-              <label
-                ><input type="checkbox" class="preset-horizon" value="5" /> 5
-                jam</label
-              >
+                1 jam
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  class="horizon-radio"
+                  name="horizon-group"
+                  value="5"
+                />
+                5 jam
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  class="horizon-radio"
+                  name="horizon-group"
+                  value="24"
+                />
+                24 jam
+              </label>
+              <label>
+                <input
+                  type="radio"
+                  class="horizon-radio"
+                  name="horizon-group"
+                  value="72"
+                />
+                72 jam
+              </label>
             </div>
-            <div>
-              <label
-                ><input type="checkbox" class="preset-horizon" value="24" /> 24
-                jam</label
-              >
-              <label
-                ><input type="checkbox" class="preset-horizon" value="72" /> 72
-                jam</label
-              >
-            </div>
-          </div>
 
-          <div class="forecast-group">
-            <label>Custom horizon (jam, max 168):</label>
-            <input
-              type="number"
-              id="customHorizon"
-              min="1"
-              max="168"
-              placeholder="contoh: 12"
-            />
+            <div class="custom-input-group">
+              <label>Custom horizon (jam, max 168):</label>
+              <input
+                type="number"
+                id="customHorizon"
+                min="1"
+                max="168"
+                placeholder="contoh: 12"
+              />
+            </div>
           </div>
 
           <button id="btnForecast" class="primary">Hitung Forecast</button>
           <div class="status" id="forecastStatus"></div>
-
+          <span class="status" id="forecastTimeNow"></span>
           <table id="forecastTable">
             <thead>
               <tr>

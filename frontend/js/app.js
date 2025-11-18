@@ -266,40 +266,121 @@ async function loadEvalSeries() {
 function setupForecastPage() {
   const btnForecast = document.getElementById("btnForecast");
   btnForecast.addEventListener("click", doForecast);
+
+  const customInput = document.getElementById("customHorizon");
+  const horizonRadios = document.querySelectorAll(".horizon-radio");
+
+  // Fungsi utilitas untuk menonaktifkan/mengaktifkan semua radio
+  function setRadioState(disabled) {
+    horizonRadios.forEach((radio) => {
+      radio.disabled = disabled;
+    });
+  }
+
+  // Listener untuk radio button (Preset)
+  horizonRadios.forEach((radio) => {
+    radio.addEventListener("change", () => {
+      // Jika radio terpilih, pastikan Custom Input dikosongkan
+      // dan pastikan radio enabled (tidak ada perubahan status disabled)
+      if (radio.checked) {
+        customInput.value = "";
+        // Tidak perlu mengubah status disabled Custom Input karena selalu active
+      }
+    });
+  });
+
+  // Listener untuk input custom
+  customInput.addEventListener("input", () => {
+    // Logika utama: mengontrol status radio button berdasarkan isi Custom Input
+    if (customInput.value.trim() !== "") {
+      // KONDISI 1: Custom Input TERISI
+
+      // 1. Nonaktifkan radio button preset
+      setRadioState(true);
+
+      // 2. Hapus pilihan (unchecked) dari semua radio
+      horizonRadios.forEach((radio) => (radio.checked = false));
+    } else {
+      // KONDISI 2: Custom Input KOSONG
+
+      // 1. Aktifkan kembali radio button
+      setRadioState(false);
+
+      // 2. Set default pilihan ke 1 jam (opsional, tapi baik untuk UX)
+      // Cek apakah sudah ada yang terpilih, jika tidak, set default
+      let isAnyChecked = Array.from(horizonRadios).some(
+        (radio) => radio.checked
+      );
+      if (!isAnyChecked) {
+        document.querySelector('.horizon-radio[value="1"]').checked = true;
+      }
+    }
+  });
+
+  // KONDISI AWAL:
+  // Custom Input harus SELALU enabled.
+  customInput.disabled = false;
+
+  // Set status awal radio berdasarkan apakah Custom Input sudah ada isinya (jika page di-refresh dengan isian)
+  if (customInput.value.trim() !== "") {
+    setRadioState(true);
+    horizonRadios.forEach((radio) => (radio.checked = false));
+  } else {
+    setRadioState(false);
+  }
 }
+
+// Catatan: Fungsi doForecast() yang sebelumnya saya berikan sudah benar
+// untuk mengambil nilai dari salah satu sumber (Custom Input atau Radio Button).
 
 async function doForecast() {
   const statusEl = document.getElementById("forecastStatus");
   const tbody = document.querySelector("#forecastTable tbody");
-  const presetCheckboxes = document.querySelectorAll(".preset-horizon");
+  const horizonRadios = document.querySelectorAll(".horizon-radio");
   const customInput = document.getElementById("customHorizon");
 
   statusEl.textContent = "";
   tbody.innerHTML = "";
 
-  // Kumpulkan horizons
+  // 1. Tentukan horizon yang dipilih/diisi
   const horizons = new Set();
-  presetCheckboxes.forEach((cb) => {
-    if (cb.checked) horizons.add(parseInt(cb.value, 10));
-  });
 
   const customVal = customInput.value.trim();
+
   if (customVal) {
+    // Prioritas 1: Ambil dari input custom jika terisi
     const n = parseInt(customVal, 10);
+
+    // Validasi input custom
     if (isNaN(n) || n < 1 || n > 168) {
       statusEl.textContent = "Custom horizon harus antara 1 hingga 168 jam.";
       return;
     }
     horizons.add(n);
+  } else {
+    // Prioritas 2: Ambil dari radio button yang terpilih
+    let selectedRadioValue = null;
+    horizonRadios.forEach((radio) => {
+      if (radio.checked) {
+        selectedRadioValue = radio.value;
+      }
+    });
+
+    if (selectedRadioValue) {
+      horizons.add(parseInt(selectedRadioValue, 10));
+    }
   }
 
+  // Harus ada 1 horizon yang terpilih/terisi
   if (horizons.size === 0) {
-    statusEl.textContent = "Pilih minimal satu horizon.";
+    statusEl.textContent =
+      "Pilih minimal satu horizon atau isi Custom Horizon.";
     return;
   }
 
-  const hoursArr = Array.from(horizons).sort((a, b) => a - b);
-  const horizonsStr = hoursArr.join(",");
+  // Lanjutkan dengan 1 horizon yang terpilih
+  const hoursArr = Array.from(horizons);
+  const horizonsStr = hoursArr.join(","); // Akan selalu hanya 1 nilai
 
   statusEl.textContent = "Menghitung forecast...";
 
@@ -308,6 +389,7 @@ async function doForecast() {
       "ETH/USDT"
     )}&horizons=${encodeURIComponent(horizonsStr)}`;
     const res = await fetch(url);
+    // ... Sisa kode tidak berubah ...
     if (!res.ok) {
       const msg = await res.text();
       throw new Error(`HTTP ${res.status}: ${msg}`);
@@ -315,6 +397,7 @@ async function doForecast() {
     const data = await res.json();
 
     const entries = Object.entries(data.results || {});
+    // Urutkan (meskipun hanya 1, tapi untuk konsistensi)
     entries.sort((a, b) => {
       const ha = parseInt(a[0].replace("h", ""), 10);
       const hb = parseInt(b[0].replace("h", ""), 10);
