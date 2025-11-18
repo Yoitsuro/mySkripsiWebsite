@@ -431,7 +431,7 @@ async function doForecast() {
       tr.innerHTML = `
         <td>${key} <br><small>Target: ${targetLocal}</small></td>
         <td>${info.steps_used}</td>
-        <td>${Number(info.pred_stack).toFixed(4)}</td>
+        <td>$${Number(info.pred_stack).toFixed(4)}</td>
       `;
       tbody.appendChild(tr);
 

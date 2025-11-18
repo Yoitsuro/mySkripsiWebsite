@@ -28,10 +28,10 @@
         <section id="page-home" class="page active">
           <h2>Harga Ethereum</h2>
           <p class="timezone-info">
-            Waktu grafik menggunakan timestamp UTC dari Binance. (Local time:
+            Waktu grafik menggunakan UTC+0 dari Binance. (Local time:
             <span id="localTime"></span>)
           </p>
-          <p>Pilih rentang waktu (interval 1 jam).</p>
+          <p>Pilih rentang waktu</p>
           <div class="controls">
             <button class="range-btn primary" data-days="1">1 Hari</button>
             <button class="range-btn" data-days="7">7 Hari</button>
@@ -66,7 +66,7 @@
 
         <!-- FORECAST -->
         <section id="page-forecast" class="page">
-          <h2>Forecast Harga ke Depan</h2>
+          <h2>Forecast Harga Ethereum</h2>
           <p>
             Semua prediksi dibuat <strong>per jam</strong>. Misalnya, memilih
             horizon 5 jam berarti Anda memprediksi harga pada jam ke-1, ke-2,
@@ -139,13 +139,13 @@
                 <tr>
                   <th>Horizon</th>
                   <th>Steps Digunakan</th>
-                  <th>Prediksi Close (Stacking)</th>
+                  <th>Prediksi Close (Stacking) - USDT</th>
                 </tr>
               </thead>
               <tbody></tbody>
             </table>
           </div>
-
+          <br />
           <h3 class="chart-header">Visualisasi Forecast</h3>
           <canvas id="forecastChart" height="120"></canvas>
           <div class="status" id="forecastChartStatus"></div>
