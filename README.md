@@ -13,3 +13,9 @@
 
 1. go to frontend dirrectory
 2. run the liveserver and go to the frontend directory
+
+yang dibauat di presentasi
+
+- buat poin-poin yang ada di presetansi saja (untuk mengingatkan)
+- setiap slide itu klo bisa satu aja, misalnya (tujuan dan manfaat) dibuatkan per slide aja walaupun hanya 1 poin
+- hasil metricsnya masukkan sebelum demo juga, selesai demo baru masuk ke simpulan dan saran

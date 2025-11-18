@@ -1,3 +1,7 @@
+body {
+  background-color: white; /* Ensure the iframe has a white background */
+}
+
 * {
   box-sizing: border-box;
 }
@@ -104,6 +108,11 @@ body {
   cursor: pointer;
 }
 
+.primary:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
 .status {
   font-size: 0.85rem;
   color: #555;
@@ -131,6 +140,40 @@ th {
 
 label {
   font-size: 0.9rem;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.radio-options label {
+  display: inline-block;
+  margin-right: 16px;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.custom-input-group {
+  margin-top: 16px;
+}
+
+.custom-input-group input[type="number"] {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+
+/* Error message styling */
+.error-message {
+  color: #d32f2f;
+  font-size: 0.85rem;
+  margin-top: 4px;
+  min-height: 1.2em;
+  display: none;
+}
+
+.error-message.show {
+  display: block;
 }
 
 /* Penyesuaian untuk Grafik Forecast */
@@ -143,4 +186,39 @@ label {
 
 #forecastChart {
   margin-top: 12px;
+}
+
+/* SCROLLABLE TABLE UNTUK FORECAST */
+.forecast-table-wrapper {
+  max-height: 400px; /* ~10 baris */
+  overflow-y: auto;
+  margin: 12px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+#forecastTable {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0;
+}
+
+#forecastTable thead th {
+  position: sticky;
+  top: 0;
+  background-color: #f2f2f2;
+  z-index: 10;
+  font-weight: bold;
+  padding: 8px;
+  text-align: center;
+}
+
+#forecastTable tbody tr {
+  border-bottom: 1px solid #eee;
+}
+
+#forecastTable tbody td {
+  padding: 8px;
+  text-align: center;
 }

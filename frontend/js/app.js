@@ -85,30 +85,28 @@ async function loadHistory(days) {
             data: prices,
             fill: false,
             borderWidth: 1,
-            pointRadius: 2, // kasih titik kecil biar kelihatan
-            pointHitRadius: 6, // area hover lebih lebar
+            pointRadius: 2,
+            pointHitRadius: 6,
           },
         ],
       },
       options: {
         responsive: true,
         interaction: {
-          mode: "nearest", // tooltip muncul ke titik terdekat
+          mode: "nearest",
           intersect: false,
         },
         plugins: {
           tooltip: {
             callbacks: {
-              // format tooltip: "Jam - Harga"
               label: function (ctx) {
                 const price = ctx.parsed.y.toFixed(2);
                 return ` Close: ${price}`;
               },
               title: function (items) {
-                // title = timestamp
                 if (items.length) {
                   const ts = items[0].label;
-                  return ts; // bisa diformat lagi kalau mau
+                  return ts;
                 }
                 return "";
               },
@@ -138,9 +136,7 @@ async function loadHistory(days) {
 
 /* ========== METRICS PAGE ========== */
 
-function setupMetricsPage() {
-  // kalau nanti mau tombol refresh, bisa di-setup di sini
-}
+function setupMetricsPage() {}
 
 async function loadMetrics() {
   const statusEl = document.getElementById("metricsStatus");
@@ -191,7 +187,6 @@ async function loadEvalSeries() {
     const labels = series.map((d) => d.timestamp);
     const yTrue = series.map((d) => d.y_true);
     const yStack = series.map((d) => d.y_stack);
-    // kalau mau tambah garis lain:
     const yLgbm = series.map((d) => d.y_lgbm);
     const yTcn = series.map((d) => d.y_tcn);
 
@@ -266,125 +261,137 @@ async function loadEvalSeries() {
 
 function setupForecastPage() {
   const btnForecast = document.getElementById("btnForecast");
-  btnForecast.addEventListener("click", doForecast);
-
   const customInput = document.getElementById("customHorizon");
+  const errorEl = document.getElementById("customHorizonError");
   const horizonRadios = document.querySelectorAll(".horizon-radio");
 
-  // Fungsi utilitas untuk menonaktifkan/mengaktifkan semua radio
-  function setRadioState(disabled) {
-    horizonRadios.forEach((radio) => {
-      radio.disabled = disabled;
-    });
-  }
-
-  // Listener untuk radio button (Preset)
-  horizonRadios.forEach((radio) => {
-    radio.addEventListener("change", () => {
-      // Jika radio terpilih, pastikan Custom Input dikosongkan
-      // dan pastikan radio enabled (tidak ada perubahan status disabled)
-      if (radio.checked) {
-        customInput.value = "";
-        // Tidak perlu mengubah status disabled Custom Input karena selalu active
-      }
-    });
-  });
-
-  // Listener untuk input custom
-  customInput.addEventListener("input", () => {
-    // Logika utama: mengontrol status radio button berdasarkan isi Custom Input
-    if (customInput.value.trim() !== "") {
-      // KONDISI 1: Custom Input TERISI
-
-      // 1. Nonaktifkan radio button preset
-      setRadioState(true);
-
-      // 2. Hapus pilihan (unchecked) dari semua radio
-      horizonRadios.forEach((radio) => (radio.checked = false));
-    } else {
-      // KONDISI 2: Custom Input KOSONG
-
-      // 1. Aktifkan kembali radio button
-      setRadioState(false);
-
-      // 2. Set default pilihan ke 1 jam (opsional, tapi baik untuk UX)
-      // Cek apakah sudah ada yang terpilih, jika tidak, set default
-      let isAnyChecked = Array.from(horizonRadios).some(
-        (radio) => radio.checked
-      );
-      if (!isAnyChecked) {
-        document.querySelector('.horizon-radio[value="1"]').checked = true;
-      }
+  // 🔥 Batasi input hanya angka 0-9
+  customInput.addEventListener("keydown", (e) => {
+    // Izinkan: backspace, delete, tab, escape, enter, panah
+    if ([46, 8, 9, 27, 13, 37, 38, 39, 40].indexOf(e.keyCode) !== -1) {
+      return;
+    }
+    // Pastikan tidak menekan Ctrl/Command (untuk copy-paste)
+    if ((e.ctrlKey || e.metaKey) && [67, 86, 88].includes(e.keyCode)) {
+      return;
+    }
+    // Hanya izinkan angka
+    if (
+      (e.shiftKey || e.keyCode < 48 || e.keyCode > 57) &&
+      (e.keyCode < 96 || e.keyCode > 105)
+    ) {
+      e.preventDefault();
     }
   });
 
-  // KONDISI AWAL:
-  // Custom Input harus SELALU enabled.
-  customInput.disabled = false;
+  // Blokir paste konten non-angka
+  customInput.addEventListener("paste", (e) => {
+    e.preventDefault();
+    const pasted = (e.clipboardData || window.clipboardData).getData("text");
+    const numeric = pasted.replace(/[^0-9]/g, "");
+    const newValue = customInput.value + numeric;
+    customInput.value = numeric; // atau sesuaikan logika
+    validateCustomInput();
+  });
 
-  // Set status awal radio berdasarkan apakah Custom Input sudah ada isinya (jika page di-refresh dengan isian)
-  if (customInput.value.trim() !== "") {
-    setRadioState(true);
-    horizonRadios.forEach((radio) => (radio.checked = false));
-  } else {
-    setRadioState(false);
+  // Helper: validasi input custom
+  function validateCustomInput() {
+    const val = customInput.value.trim();
+    if (val === "") {
+      errorEl.classList.remove("show");
+      btnForecast.disabled = false;
+      return true;
+    }
+
+    // Hanya angka, tanpa e/E/dll
+    if (!/^\d+$/.test(val)) {
+      errorEl.textContent = "Hanya angka diperbolehkan.";
+      errorEl.classList.add("show");
+      btnForecast.disabled = true;
+      return false;
+    }
+
+    const num = parseInt(val, 10);
+    if (num < 1 || num > 168) {
+      errorEl.textContent = "Masukkan angka antara 1 dan 168.";
+      errorEl.classList.add("show");
+      btnForecast.disabled = true;
+      return false;
+    }
+
+    errorEl.classList.remove("show");
+    btnForecast.disabled = false;
+    return true;
   }
+
+  // Saat input custom berubah
+  customInput.addEventListener("input", () => {
+    horizonRadios.forEach((r) => (r.checked = false));
+    validateCustomInput();
+  });
+
+  // Saat radio dipilih
+  horizonRadios.forEach((radio) => {
+    radio.addEventListener("change", () => {
+      if (radio.checked) {
+        customInput.value = "";
+        errorEl.classList.remove("show");
+        btnForecast.disabled = false;
+      }
+    });
+  });
+
+  // Event klik tombol forecast
+  btnForecast.addEventListener("click", () => {
+    if (!validateCustomInput()) return;
+    doForecast();
+  });
+
+  // Initial state
+  validateCustomInput();
 }
 
-// Catatan: Fungsi doForecast() yang sebelumnya saya berikan sudah benar
-// untuk mengambil nilai dari salah satu sumber (Custom Input atau Radio Button).
-
-// GANTI SELURUH FUNGSI INI
+// Fungsi utama forecast (sudah aman karena validasi di atas)
 async function doForecast() {
   const statusEl = document.getElementById("forecastStatus");
-  const chartStatusEl = document.getElementById("forecastChartStatus"); // Status u/ chart
+  const chartStatusEl = document.getElementById("forecastChartStatus");
   const tbody = document.querySelector("#forecastTable tbody");
   const horizonRadios = document.querySelectorAll(".horizon-radio");
   const customInput = document.getElementById("customHorizon");
 
-  // Reset status
   statusEl.textContent = "";
   chartStatusEl.textContent = "";
   tbody.innerHTML = "";
 
-  // 1. Hancurkan chart lama (jika ada)
   if (forecastChart) {
     forecastChart.destroy();
     forecastChart = null;
   }
 
-  // 2. Tentukan horizon MAKSIMAL yang dipilih
   let maxHorizon = 0;
   const customVal = customInput.value.trim();
 
   if (customVal) {
-    // Prioritas 1: Ambil dari input custom
     const n = parseInt(customVal, 10);
+    // Validasi ini seharusnya sudah lolos dari UI, tapi tetap dicek
     if (isNaN(n) || n < 1 || n > 168) {
       statusEl.textContent = "Custom horizon harus antara 1 hingga 168 jam.";
       return;
     }
     maxHorizon = n;
   } else {
-    // Prioritas 2: Ambil dari radio button
-    let selectedRadioValue = null;
     horizonRadios.forEach((radio) => {
       if (radio.checked) {
-        selectedRadioValue = radio.value;
+        maxHorizon = parseInt(radio.value, 10);
       }
     });
-    if (selectedRadioValue) {
-      maxHorizon = parseInt(selectedRadioValue, 10);
-    }
   }
 
   if (maxHorizon === 0) {
-    statusEl.textContent =
-      "Pilih minimal satu horizon atau isi Custom Horizon.";
+    statusEl.textContent = "Pilih minimal satu horizon.";
     return;
   }
 
-  // 3. PERUBAHAN UTAMA: Buat string "1,2,3,...,maxHorizon"
   const hoursArr = Array.from({ length: maxHorizon }, (_, i) => i + 1);
   const horizonsStr = hoursArr.join(",");
 
@@ -402,19 +409,16 @@ async function doForecast() {
     const data = await res.json();
 
     const entries = Object.entries(data.results || {});
-    // Urutkan berdasarkan horizon (1h, 2h, 3h, ...)
     entries.sort((a, b) => {
       const ha = parseInt(a[0].replace("h", ""), 10);
       const hb = parseInt(b[0].replace("h", ""), 10);
       return ha - hb;
     });
 
-    // 4. Siapkan data untuk tabel DAN grafik
     const chartLabels = [];
     const chartData = [];
 
     entries.forEach(([key, info]) => {
-      // Data untuk Tabel
       const targetLocal = new Date(info.target_time_local).toLocaleString(
         "id-ID",
         {
@@ -431,9 +435,8 @@ async function doForecast() {
       `;
       tbody.appendChild(tr);
 
-      // Data untuk Grafik
-      chartLabels.push(targetLocal); // Sumbu X
-      chartData.push(Number(info.pred_stack)); // Sumbu Y
+      chartLabels.push(targetLocal);
+      chartData.push(Number(info.pred_stack));
     });
 
     document.getElementById("forecastTimeNow").textContent =
@@ -442,7 +445,6 @@ async function doForecast() {
 
     statusEl.textContent = `Forecast selesai. Timeframe: ${data.timeframe}.`;
 
-    // 5. Render Grafik
     if (chartLabels.length > 0) {
       const ctx = document.getElementById("forecastChart").getContext("2d");
       forecastChart = new Chart(ctx, {
@@ -457,7 +459,7 @@ async function doForecast() {
               borderWidth: 1.5,
               pointRadius: 2,
               pointHitRadius: 6,
-              borderColor: "#007bff", // Warna biru
+              borderColor: "#007bff",
               tension: 0.1,
             },
           ],
@@ -469,12 +471,12 @@ async function doForecast() {
             tooltip: {
               callbacks: {
                 label: (ctx) => ` Prediksi: ${ctx.parsed.y.toFixed(4)}`,
-                title: (items) => items[0]?.label || "", // Judul tooltip pakai timestamp
+                title: (items) => items[0]?.label || "",
               },
             },
           },
           scales: {
-            x: { ticks: { maxTicksLimit: 10 } }, // Batasi label X
+            x: { ticks: { maxTicksLimit: 10 } },
             y: { beginAtZero: false },
           },
         },
