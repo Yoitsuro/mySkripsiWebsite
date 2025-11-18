@@ -2,23 +2,29 @@
 
 .radio-options label {
   display: inline-block;
-  margin-right: 16px;
-  margin-bottom: 8px;
+  margin-right: 20px;
+  margin-bottom: 10px;
   cursor: pointer;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.radio-options input[type="radio"] {
+  margin-right: 6px;
 }
 
 .custom-input-group {
-  margin-top: 16px;
+  margin-top: 20px;
 }
 
 /* SCROLLABLE TABLE UNTUK FORECAST */
 .forecast-table-wrapper {
-  max-height: 400px; /* ~10 baris */
+  max-height: 400px;
   overflow-y: auto;
-  margin: 12px 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: #fff;
+  margin: 16px 0;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background-color: var(--bg-card);
 }
 
 #forecastTable {
@@ -30,26 +36,32 @@
 #forecastTable thead th {
   position: sticky;
   top: 0;
-  background-color: #f2f2f2;
+  background-color: var(--table-header-bg);
   z-index: 10;
-  font-weight: bold;
-  padding: 8px;
+  font-weight: 600;
+  padding: 10px;
   text-align: center;
 }
 
 #forecastTable tbody tr {
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--border-color);
+}
+
+#forecastTable tbody tr:hover {
+  background-color: var(--table-row-hover);
 }
 
 #forecastTable tbody td {
-  padding: 8px;
+  padding: 10px;
   text-align: center;
+  font-size: 0.9rem;
 }
 
 /* Header grafik forecast */
 .chart-header {
-  margin-top: 24px;
-  margin-bottom: 8px;
-  border-top: 1px solid #eee;
-  padding-top: 16px;
+  margin-top: 28px;
+  margin-bottom: 12px;
+  border-top: 1px solid var(--border-color);
+  padding-top: 20px;
+  color: var(--text-primary);
 }

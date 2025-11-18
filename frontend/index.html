@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" id="theme-root">
   <head>
     <meta charset="UTF-8" />
     <title>ETH Forecast - TCN + LGBM</title>
@@ -18,6 +18,17 @@
         <div class="sidebar-header">
           <h1 class="app-title">ETH Forecast</h1>
           <p class="app-subtitle">TCN + LGBM + Stacking</p>
+          <div class="local-time-display" id="localTimeDisplay">
+            <span id="localTimeDate">--/--/----</span>
+            <span id="localTimeTime">--:--:--</span>
+          </div>
+          <button
+            id="theme-toggle"
+            class="theme-toggle-btn"
+            aria-label="Toggle theme"
+          >
+            <span class="theme-icon">🌞</span>
+          </button>
         </div>
 
         <nav class="sidebar-nav">
@@ -32,10 +43,6 @@
         <!-- HOME -->
         <section id="page-home" class="page active">
           <h2>Harga Ethereum</h2>
-          <p class="timezone-info">
-            Waktu grafik menggunakan UTC+0 dari Binance. (Local time:
-            <span id="localTime"></span>)
-          </p>
           <p>Pilih rentang waktu</p>
           <div class="controls">
             <button class="range-btn primary" data-days="1">1 Hari</button>
@@ -69,6 +76,13 @@
         <section id="page-metrics" class="page">
           <h2>Performa Model</h2>
           <p>Metrik evaluasi pada data uji.</p>
+          <button
+            id="btnReloadMetrics"
+            class="primary"
+            style="margin-bottom: 12px"
+          >
+            ↻ Muat Ulang Data
+          </button>
           <div class="status" id="metricsStatus"></div>
           <table id="metricsTable">
             <thead>
@@ -95,7 +109,7 @@
             ..., hingga ke-5 dari sekarang.
           </p>
           <p>Maksimal prediksi: <strong>168 jam (7 hari)</strong>.</p>
-
+          <p><strong>Horizon</strong></p>
           <div class="forecast-group">
             <div class="radio-options">
               <label>
@@ -138,7 +152,7 @@
             </div>
 
             <div class="custom-input-group">
-              <label>Custom horizon (1–168 jam):</label>
+              <label><strong>Custom horizon (1–168 jam):</strong></label>
               <input
                 type="number"
                 id="customHorizon"

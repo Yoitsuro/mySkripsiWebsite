@@ -23,10 +23,14 @@ async function loadMetrics() {
     });
 
     statusEl.textContent = "Metrics berhasil dimuat.";
+    statusEl.classList.add("success");
+    statusEl.classList.remove("error");
   } catch (err) {
     console.error(err);
     statusEl.textContent =
       "Gagal mengambil metrics (cek backend & file metrics_eth.csv).";
+    statusEl.classList.add("error");
+    statusEl.classList.remove("success");
   }
 }
 
@@ -101,23 +105,43 @@ async function loadEvalSeries() {
           x: {
             ticks: {
               maxTicksLimit: 10,
+              color: window
+                .getComputedStyle(document.body)
+                .getPropertyValue("--text-primary")
+                .trim(),
             },
           },
           y: {
             beginAtZero: false,
+            ticks: {
+              color: window
+                .getComputedStyle(document.body)
+                .getPropertyValue("--text-primary")
+                .trim(),
+            },
           },
         },
       },
     });
 
     statusEl.textContent = "Visualisasi prediksi berhasil dimuat.";
+    statusEl.classList.add("success");
+    statusEl.classList.remove("error");
   } catch (err) {
     console.error(err);
     statusEl.textContent =
       "Gagal memuat visualisasi prediksi (cek endpoint /eval-series).";
+    statusEl.classList.add("error");
+    statusEl.classList.remove("success");
   }
 }
 
 function setupMetricsPage() {
-  // Bisa dikosongkan atau isi logika tambahan di sini nanti
+  const reloadBtn = document.getElementById("btnReloadMetrics");
+  if (reloadBtn) {
+    reloadBtn.addEventListener("click", () => {
+      loadMetrics();
+      loadEvalSeries();
+    });
+  }
 }

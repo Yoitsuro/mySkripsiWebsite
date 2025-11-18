@@ -40,9 +40,13 @@ async function doForecast() {
   const customInput = document.getElementById("customHorizon");
   const horizonRadios = document.querySelectorAll(".horizon-radio");
 
+  // 🔁 Reset semua status sebelum mulai
   statusEl.textContent = "";
+  statusEl.classList.remove("success", "error");
   chartStatusEl.textContent = "";
+  chartStatusEl.classList.remove("success", "error");
   tbody.innerHTML = "";
+  document.getElementById("forecastTimeNow").textContent = "";
 
   if (forecastChart) {
     forecastChart.destroy();
@@ -56,6 +60,7 @@ async function doForecast() {
     const n = parseInt(customVal, 10);
     if (isNaN(n) || n < 1 || n > 168) {
       statusEl.textContent = "Custom horizon harus antara 1 hingga 168 jam.";
+      statusEl.classList.add("error");
       return;
     }
     maxHorizon = n;
@@ -69,6 +74,7 @@ async function doForecast() {
 
   if (maxHorizon === 0) {
     statusEl.textContent = "Pilih minimal satu horizon.";
+    statusEl.classList.add("error");
     return;
   }
 
@@ -118,19 +124,20 @@ async function doForecast() {
       chartData.push(Number(info.pred_stack));
     });
 
+    statusEl.textContent = `Forecast selesai. Timeframe: ${data.timeframe}.`;
+    statusEl.classList.add("success");
+    statusEl.classList.remove("error");
+
     document.getElementById("forecastTimeNow").textContent =
       "Forecast dihasilkan pada: " +
       new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" });
 
-    statusEl.textContent = `Forecast selesai. Timeframe: ${data.timeframe}.`;
-
     // Reset tampilan grafik sebelumnya
     const forecastChartCanvas = document.getElementById("forecastChart");
-    forecastChartCanvas.style.display = "block"; // default tampilkan
+    forecastChartCanvas.style.display = "block";
     chartStatusEl.textContent = "";
 
     if (chartLabels.length > 1) {
-      // Buat grafik hanya jika > 1 titik
       const ctx = forecastChartCanvas.getContext("2d");
       forecastChart = new Chart(ctx, {
         type: "line",
@@ -164,26 +171,44 @@ async function doForecast() {
             x: {
               ticks: {
                 maxTicksLimit: 10,
+                color: window
+                  .getComputedStyle(document.body)
+                  .getPropertyValue("--text-primary")
+                  .trim(),
               },
             },
             y: {
               beginAtZero: false,
+              ticks: {
+                color: window
+                  .getComputedStyle(document.body)
+                  .getPropertyValue("--text-primary")
+                  .trim(),
+              },
             },
           },
         },
       });
       chartStatusEl.textContent = "Grafik forecast berhasil dimuat.";
+      chartStatusEl.classList.add("success");
+      chartStatusEl.classList.remove("error");
     } else {
-      // Sembunyikan canvas jika hanya 1 jam
+      // Hanya 1 jam → sembunyikan grafik, tapi ini BUKAN error
       forecastChartCanvas.style.display = "none";
       chartStatusEl.textContent =
         "Grafik tidak ditampilkan untuk horizon 1 jam.";
+      // ✅ Tidak ada .add("error") di sini
     }
   } catch (err) {
     console.error(err);
     statusEl.textContent =
       "Terjadi error saat memanggil API forecast. Cek log backend.";
+    statusEl.classList.add("error");
+    statusEl.classList.remove("success");
+
     chartStatusEl.textContent = "Gagal memuat grafik forecast.";
+    chartStatusEl.classList.add("error");
+    chartStatusEl.classList.remove("success");
   }
 }
 

@@ -33,6 +33,9 @@ async function loadHistory(days) {
       );
       const prices = series.map((d) => parseFloat(d.close) || 0);
 
+      const MIN_X_TICKS = 6;
+      const PIXEL_PER_TICK = 30;
+
       priceChart = new Chart(ctx, {
         type: "line",
         data: {
@@ -50,6 +53,7 @@ async function loadHistory(days) {
           ],
         },
         options: {
+          maintainAspectRatio: false, // biar tinggi canvas tidak terpengaruh rasio default
           responsive: true,
           interaction: { mode: "nearest", intersect: false },
           plugins: {
@@ -61,10 +65,39 @@ async function loadHistory(days) {
             },
           },
           scales: {
-            x: { ticks: { maxTicksLimit: 10 } },
-            y: { beginAtZero: false },
+            x: {
+              ticks: {
+                autoSkip: true,
+                autoSkipPadding: PIXEL_PER_TICK, // jarak antar label minimal 30px
+                maxTicksLimit: (context) => {
+                  const width = context.chart?.width || ctx.canvas.clientWidth;
+                  const computedLimit = Math.floor((width || 0) / PIXEL_PER_TICK);
+                  return Math.max(MIN_X_TICKS, computedLimit || MIN_X_TICKS);
+                },
+                color: window
+                  .getComputedStyle(document.body)
+                  .getPropertyValue("--text-primary")
+                  .trim(),
+              },
+            },
+            y: {
+              beginAtZero: false,
+              ticks: {
+                color: window
+                  .getComputedStyle(document.body)
+                  .getPropertyValue("--text-primary")
+                  .trim(),
+              },
+            },
           },
         },
+      });
+
+      // Paksa resize sekali setelah render agar grafik tidak gepeng saat pertama dimuat
+      requestAnimationFrame(() => {
+        if (priceChart) {
+          priceChart.resize();
+        }
       });
     } else {
       // Jika tidak ada data, clear canvas
@@ -110,11 +143,15 @@ async function loadHistory(days) {
     }
 
     statusEl.textContent = `Menampilkan ${data.symbol} untuk ${data.days} hari terakhir (interval ${data.timeframe}).`;
+    statusEl.classList.remove("error");
+    statusEl.classList.add("success");
   } catch (err) {
     console.error(err);
     statusEl.textContent =
       "Gagal mengambil data harga (cek backend & koneksi).";
     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">Error memuat data</td></tr>`;
+    statusEl.classList.add("error");
+    statusEl.classList.remove("success");
   }
 }
 

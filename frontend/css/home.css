@@ -1,17 +1,17 @@
 /* home.css */
 .timezone-info {
   font-size: 0.9rem;
-  color: #666;
-  margin-bottom: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
 }
 
 .ohlcv-table-wrapper {
-  max-height: 400px; /* ~10 baris */
+  max-height: 400px;
   overflow-y: auto;
-  margin: 16px 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: #fff;
+  margin: 20px 0;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background-color: var(--bg-card);
 }
 
 #ohlcvTable {
@@ -22,14 +22,22 @@
 #ohlcvTable thead th {
   position: sticky;
   top: 0;
-  background-color: #f2f2f2;
+  background-color: var(--table-header-bg);
   z-index: 10;
-  padding: 8px;
+  padding: 10px;
   text-align: center;
 }
 
+#ohlcvTable tbody tr {
+  border-bottom: 1px solid var(--border-color);
+}
+
+#ohlcvTable tbody tr:hover {
+  background-color: var(--table-row-hover);
+}
+
 #ohlcvTable tbody td {
-  padding: 8px;
+  padding: 10px;
   text-align: center;
   font-size: 0.85rem;
 }
