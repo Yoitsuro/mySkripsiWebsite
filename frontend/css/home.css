@@ -1,0 +1,35 @@
+/* home.css */
+.timezone-info {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 12px;
+}
+
+.ohlcv-table-wrapper {
+  max-height: 400px; /* ~10 baris */
+  overflow-y: auto;
+  margin: 16px 0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+#ohlcvTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+#ohlcvTable thead th {
+  position: sticky;
+  top: 0;
+  background-color: #f2f2f2;
+  z-index: 10;
+  padding: 8px;
+  text-align: center;
+}
+
+#ohlcvTable tbody td {
+  padding: 8px;
+  text-align: center;
+  font-size: 0.85rem;
+}

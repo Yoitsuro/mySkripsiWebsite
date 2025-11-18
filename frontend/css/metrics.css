@@ -1,0 +1,9 @@
+/* metrics.css */
+#metricsTable {
+  margin-top: 16px;
+}
+
+/* Opsional: highlight baris atau hover */
+#metricsTable tbody tr:hover {
+  background-color: #f9f9f9;
+}

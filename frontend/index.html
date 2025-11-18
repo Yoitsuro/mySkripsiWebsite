@@ -3,7 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <title>ETH Forecast - TCN + LGBM</title>
+    <!-- Global styles -->
     <link rel="stylesheet" href="css/style.css" />
+    <!-- Page-specific styles -->
+    <link rel="stylesheet" href="css/home.css" />
+    <link rel="stylesheet" href="css/metrics.css" />
+    <link rel="stylesheet" href="css/forecast.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <body>
@@ -39,6 +44,25 @@
           </div>
           <div class="status" id="homeStatus"></div>
           <canvas id="priceChart" height="120"></canvas>
+
+          <!-- TABEL OHLCV BARU -->
+          <h3>Data OHLCV Terkini</h3>
+          <div class="ohlcv-table-wrapper">
+            <table id="ohlcvTable">
+              <thead>
+                <tr>
+                  <th>Waktu</th>
+                  <th>Open (USDT)</th>
+                  <th>High (USDT)</th>
+                  <th>Low (USDT)</th>
+                  <th>Close (USDT)</th>
+                  <th>Volume (ETH)</th>
+                  <th>Volume (USDT)</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
         </section>
 
         <!-- METRICS -->
@@ -51,8 +75,6 @@
               <tr>
                 <th>Model</th>
                 <th>RMSE</th>
-                <th>MSE</th>
-                <th>MAE</th>
                 <th>MAPE</th>
               </tr>
             </thead>
@@ -138,7 +160,6 @@
               <thead>
                 <tr>
                   <th>Horizon</th>
-                  <th>Steps Digunakan</th>
                   <th>Prediksi Close (Stacking) - USDT</th>
                 </tr>
               </thead>
@@ -153,6 +174,9 @@
       </main>
     </div>
 
+    <script src="js/pages/home.js"></script>
+    <script src="js/pages/metrics.js"></script>
+    <script src="js/pages/forecast.js"></script>
     <script src="js/app.js"></script>
   </body>
 </html>

@@ -1,7 +1,4 @@
-body {
-  background-color: white; /* Ensure the iframe has a white background */
-}
-
+/* style.css - Gaya Global */
 * {
   box-sizing: border-box;
 }
@@ -79,6 +76,7 @@ body {
   display: block;
 }
 
+/* Kontrol Umum */
 .controls,
 .forecast-group {
   margin: 8px 0 12px;
@@ -113,6 +111,7 @@ body {
   cursor: not-allowed;
 }
 
+/* Status teks */
 .status {
   font-size: 0.85rem;
   color: #555;
@@ -120,6 +119,7 @@ body {
   margin-bottom: 8px;
 }
 
+/* Tabel Umum */
 table {
   width: 100%;
   border-collapse: collapse;
@@ -138,21 +138,11 @@ th {
   background-color: #f2f2f2;
 }
 
+/* Form & Input Umum */
 label {
   font-size: 0.9rem;
   display: block;
   margin-bottom: 4px;
-}
-
-.radio-options label {
-  display: inline-block;
-  margin-right: 16px;
-  margin-bottom: 8px;
-  cursor: pointer;
-}
-
-.custom-input-group {
-  margin-top: 16px;
 }
 
 .custom-input-group input[type="number"] {
@@ -163,7 +153,7 @@ label {
   font-size: 0.95rem;
 }
 
-/* Error message styling */
+/* Error message */
 .error-message {
   color: #d32f2f;
   font-size: 0.85rem;
@@ -176,49 +166,9 @@ label {
   display: block;
 }
 
-/* Penyesuaian untuk Grafik Forecast */
-.chart-header {
-  margin-top: 24px;
-  margin-bottom: 8px;
-  border-top: 1px solid #eee;
-  padding-top: 16px;
-}
-
+/* Grafik */
+#priceChart,
+#evalChart,
 #forecastChart {
   margin-top: 12px;
-}
-
-/* SCROLLABLE TABLE UNTUK FORECAST */
-.forecast-table-wrapper {
-  max-height: 400px; /* ~10 baris */
-  overflow-y: auto;
-  margin: 12px 0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background-color: #fff;
-}
-
-#forecastTable {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 0;
-}
-
-#forecastTable thead th {
-  position: sticky;
-  top: 0;
-  background-color: #f2f2f2;
-  z-index: 10;
-  font-weight: bold;
-  padding: 8px;
-  text-align: center;
-}
-
-#forecastTable tbody tr {
-  border-bottom: 1px solid #eee;
-}
-
-#forecastTable tbody td {
-  padding: 8px;
-  text-align: center;
 }
