@@ -171,20 +171,11 @@ async function doForecast() {
             x: {
               ticks: {
                 maxTicksLimit: 10,
-                color: window
-                  .getComputedStyle(document.body)
-                  .getPropertyValue("--text-primary")
-                  .trim(),
               },
             },
             y: {
               beginAtZero: false,
-              ticks: {
-                color: window
-                  .getComputedStyle(document.body)
-                  .getPropertyValue("--text-primary")
-                  .trim(),
-              },
+              ticks: {},
             },
           },
         },

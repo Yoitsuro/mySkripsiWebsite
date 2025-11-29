@@ -71,23 +71,16 @@ async function loadHistory(days) {
                 autoSkipPadding: PIXEL_PER_TICK, // jarak antar label minimal 30px
                 maxTicksLimit: (context) => {
                   const width = context.chart?.width || ctx.canvas.clientWidth;
-                  const computedLimit = Math.floor((width || 0) / PIXEL_PER_TICK);
+                  const computedLimit = Math.floor(
+                    (width || 0) / PIXEL_PER_TICK
+                  );
                   return Math.max(MIN_X_TICKS, computedLimit || MIN_X_TICKS);
                 },
-                color: window
-                  .getComputedStyle(document.body)
-                  .getPropertyValue("--text-primary")
-                  .trim(),
               },
             },
             y: {
               beginAtZero: false,
-              ticks: {
-                color: window
-                  .getComputedStyle(document.body)
-                  .getPropertyValue("--text-primary")
-                  .trim(),
-              },
+              ticks: {},
             },
           },
         },
@@ -110,10 +103,6 @@ async function loadHistory(days) {
     if (series.length === 0) {
       tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Tidak ada data</td></tr>`;
     } else {
-      // 🔥 TIDAK DIBALIK — biarkan urutan asli (dari API: lama → baru)
-      // Jika API mengembalikan data dari lama ke baru, langsung pakai `series`
-      // Jika tidak, pastikan backend mengirim ascending
-
       series.forEach((d) => {
         const open = parseFloat(d.open) || 0;
         const high = parseFloat(d.high) || 0;
