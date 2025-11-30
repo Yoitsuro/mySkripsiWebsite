@@ -1,26 +1,5 @@
 const API_BASE = "http://localhost:8000";
 
-// Theme toggle logic
-function initTheme() {
-  const root = document.getElementById("theme-root");
-  const toggleBtn = document.getElementById("theme-toggle");
-  const icon = toggleBtn.querySelector(".theme-icon");
-
-  // Load saved theme
-  const savedTheme = localStorage.getItem("theme") || "light";
-  root.setAttribute("data-theme", savedTheme);
-  icon.textContent = savedTheme === "dark" ? "🌙" : "🌞";
-
-  // Toggle theme
-  toggleBtn.addEventListener("click", () => {
-    const current = root.getAttribute("data-theme");
-    const newTheme = current === "dark" ? "light" : "dark";
-    root.setAttribute("data-theme", newTheme);
-    localStorage.setItem("theme", newTheme);
-    icon.textContent = newTheme === "dark" ? "🌙" : "🌞";
-  });
-}
-
 function updateLocalTime() {
   const now = new Date();
 
@@ -47,9 +26,6 @@ function updateLocalTime() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Initialize theme FIRST
-  initTheme();
-
   // Start real-time clock AFTER DOM is ready
   setInterval(updateLocalTime, 1000); // Update setiap detik
   updateLocalTime(); // Update segera

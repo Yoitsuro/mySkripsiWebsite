@@ -8,6 +8,8 @@ async function loadHistory(days) {
   // Reset UI
   statusEl.textContent = "Mengambil data harga...";
   tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;">Memuat...</td></tr>`;
+  statusEl.classList.remove("error");
+  statusEl.classList.remove("success");
 
   // Hancurkan chart lama
   if (priceChart) {
