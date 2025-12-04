@@ -21,12 +21,12 @@ model_lgb, model_tcn, meta_model = load_models()
 
 # Coba load metrics; kalau tidak ada, pakai DataFrame kosong
 try:
-    metrics_df = pd.read_csv("metrics_eth.csv", index_col=0)
+    metrics_df = pd.read_csv("03 dec 2025 metrics_eth.csv", index_col=0)
 except FileNotFoundError:
     metrics_df = pd.DataFrame()
 
 try:
-  eval_series_df = pd.read_csv("eval_series_eth.csv", parse_dates=["timestamp"])
+  eval_series_df = pd.read_csv("03 dec 2025 eval_series_eth.csv", parse_dates=["timestamp"])
 except FileNotFoundError:
   eval_series_df = pd.DataFrame()
 
@@ -87,7 +87,7 @@ def get_history(
 def get_metrics():
     if metrics_df.empty:
         # Supaya jelas kalau file metrics belum ada
-        raise HTTPException(status_code=500, detail="metrics_eth.csv tidak ditemukan atau kosong.")
+        raise HTTPException(status_code=500, detail="03 dec 2025 metrics_eth.csv tidak ditemukan atau kosong.")
     return metrics_df.to_dict(orient="index")
 
 
@@ -98,7 +98,7 @@ def get_eval_series(limit: int = 200):
     limit = berapa titik terakhir yang mau dikirim (biar chart nggak kebanyakan).
     """
     if eval_series_df.empty:
-        raise HTTPException(status_code=500, detail="eval_series_eth.csv tidak ditemukan atau kosong.")
+        raise HTTPException(status_code=500, detail="03 dec 2025 eval_series_eth.csv tidak ditemukan atau kosong.")
 
     df = eval_series_df.copy().sort_values("timestamp")
     if limit is not None and limit > 0:
